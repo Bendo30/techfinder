@@ -94,4 +94,22 @@ class UtilisateursController extends Controller
             return response()->json(['error' => 'Failed to delete utilisateur', 'message' => $e->getMessage()], 500);
         }
     }
+
+    //fonction pour rechercher à partir d'un mot clé dans le nom, prénom ou login
+    public function search(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|max:255',
+        ]);
+        try{
+            $query = $request->input('query');
+            $utilisateurs = Utilisateur::where('nom_user', 'like', "%$query%")
+                ->orWhere('prenom_user', 'like', "%$query%")
+                ->orWhere('login_user', 'like', "%$query%")
+                ->get();
+            return response()->json($utilisateurs, 200);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Failed to search utilisateurs', 'message' => $e->getMessage()], 500);
+        }
+    }
 }

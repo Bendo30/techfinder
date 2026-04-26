@@ -19,24 +19,20 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         
 
-        // $this->call([
-        //     CompetenceSeeder::class
-        // ]);
+        $this->call([
+            CompetenceSeeder::class
+        ]);
         $this->call([
             UtilisateurSeeder::class
         ]);
 
-        // $this->call([
-        //     CompetenceSeeder::class
-        // ]);
+        $this->call([
+            InterventionSeeder::class
+        ]);
 
-        // $this->call([
-        //     InterventionSeeder::class
-        // ]);
-
-        // $this->call([
-        //     User_CompetenceSeeder::class
-        // ]);
+        $this->call([
+            UserCompetenceSeeder::class
+        ]);
 
 
 

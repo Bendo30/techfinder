@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use \App\Models\Utilisateur;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\UserCompetence>
  */
-class User_CompetenceFactory extends Factory
+class UserCompetenceFactory extends Factory
 {
     /**
      * Define the model's default state.

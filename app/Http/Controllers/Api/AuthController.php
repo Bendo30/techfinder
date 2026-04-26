@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -19,9 +18,10 @@ class AuthController extends Controller
     public function jwtRegister(Request $request)
     {
         $request->validate([
+            'code_user' => 'sometimes|string|max:255|unique:utilisateurs,code_user',
             'nom_user'     => 'required|string|max:255',
             'prenom_user'    => 'required|string|max:255',
-            'login_user' => 'required|string|max:255|unique:users',
+            'login_user' => 'required|string|max:255|unique:utilisateurs',
             'password_user' => 'required|string|min:8|confirmed',
             'tel_user' => 'required|string|max:20',
             'sexe_user' => 'required|in:M,F',
@@ -29,11 +29,20 @@ class AuthController extends Controller
             'etat_user' => 'required|in:actif,inactif,suspendu',
         ]);
 
-        $user = User::create([
+        // Générer un code_user unique si non fourni
+        $codeUser = $request->code_user ?? 'USR' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+        // S'assurer que le code est unique
+        while (Utilisateur::where('code_user', $codeUser)->exists()) {
+            $codeUser = 'USR' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        }
+
+        $user = Utilisateur::create([
+            'code_user' => $codeUser,
             'nom_user'     => $request->nom_user,
             'prenom_user'    => $request->prenom_user,
             'login_user' => $request->login_user,
-            'password_user' => Hash::make($request->password_user),
+            'password_user' => $request->password_user,
             'tel_user' => $request->tel_user,
             'sexe_user' => $request->sexe_user,
             'role_user' => $request->role_user,
@@ -92,9 +101,10 @@ class AuthController extends Controller
     public function sanctumRegister(Request $request)
     {
         $request->validate([
+            'code_user' => 'sometimes|string|max:255|unique:utilisateurs,code_user',
             'nom_user'     => 'required|string|max:255',
             'prenom_user'    => 'required|string|max:255',
-            'login_user' => 'required|string|max:255|unique:users',
+            'login_user' => 'required|string|max:255|unique:utilisateurs',
             'password_user' => 'required|string|min:8|confirmed',
             'tel_user' => 'required|string|max:20',
             'sexe_user' => 'required|in:M,F',
@@ -102,11 +112,20 @@ class AuthController extends Controller
             'etat_user' => 'required|in:actif,inactif,suspendu',
         ]);
 
-        $user  = User::create([
+        // Générer un code_user unique si non fourni
+        $codeUser = $request->code_user ?? 'USR' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+        // S'assurer que le code est unique
+        while (Utilisateur::where('code_user', $codeUser)->exists()) {
+            $codeUser = 'USR' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        }
+
+        $user  = Utilisateur::create([
+            'code_user' => $codeUser,
             'nom_user'     => $request->nom_user,
             'prenom_user'    => $request->prenom_user,
             'login_user' => $request->login_user,
-            'password_user' => Hash::make($request->password_user),
+            'password_user' => $request->password_user,
             'tel_user' => $request->tel_user,
             'sexe_user' => $request->sexe_user,
             'role_user' => $request->role_user,
@@ -129,7 +148,7 @@ class AuthController extends Controller
             'password_user' => 'required|string',
         ]);
 
-        if (!Auth::attempt($request->only('login_user', 'password_user'))) {
+        if (!Auth::attempt(['login_user' => $request->login_user, 'password_user' => $request->password_user])) {
             throw ValidationException::withMessages([
                 'login_user' => ['Identifiants invalides.'],
             ]);
@@ -147,7 +166,13 @@ class AuthController extends Controller
 
     public function sanctumLogout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete;
+        /** @var \Laravel\Sanctum\PersonalAccessToken|null $token */
+        $token = $request->user()->currentAccessToken();
+
+        if ($token) {
+            $token->delete();
+        }
+
         return response()->json(['message' => 'Déconnecté avec succès']);
     }
 

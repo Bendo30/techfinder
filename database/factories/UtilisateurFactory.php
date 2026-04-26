@@ -21,7 +21,7 @@ class UtilisateurFactory extends Factory
             'nom_user'=> $this->faker->lastName(),
             'prenom_user'=> $this->faker->firstName(),
             'login_user'=> $this->faker->unique()->userName(),
-            'password_user'=> bcrypt('password'),
+            'password_user'=> 'password', // Le mutateur du modèle va le hasher automatiquement
             'tel_user'=> $this->faker->phoneNumber(),
             'sexe_user'=> $this->faker->randomElement(['M', 'F']),
             'role_user'=> $this->faker->randomElement(['client', 'technicien']),

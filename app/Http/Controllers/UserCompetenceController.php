@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User_Competence;
+use App\Models\UserCompetence;
 use Illuminate\Http\Request;
 
 class UserCompetenceController extends Controller
@@ -13,7 +13,7 @@ class UserCompetenceController extends Controller
     public function index()
     {
         try{
-            $userCompetences = User_Competence::all();
+            $userCompetences = UserCompetence::all();
             return response()->json($userCompetences, 200);
         }catch(\Exception $e){
             return response()->json(['error' => 'Failed to retrieve user competences', 'message' => $e->getMessage()], 500);
@@ -30,7 +30,7 @@ class UserCompetenceController extends Controller
             'code_comp' => 'required|integer',
         ]);
         try{
-            $userCompetence = User_Competence::create(['code_user' => $request->code_user, 'code_comp' => $request->code_comp]);
+            $userCompetence = UserCompetence::create(['code_user' => $request->code_user, 'code_comp' => $request->code_comp]);
             return response()->json($userCompetence, 201);
         }catch(\Exception $e){
             return response()->json(['error' => 'Failed to create user competence', 'message' => $e->getMessage()], 500);
@@ -40,10 +40,10 @@ class UserCompetenceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $code_user, int $code_comp)
+    public function show(string $code_user, int $code_comp)
     {
         try{
-            $userCompetence = User_Competence::where('code_user', $code_user)->where('code_comp', $code_comp)->first();
+            $userCompetence = UserCompetence::where('code_user', $code_user)->where('code_comp', $code_comp)->first();
             if(!$userCompetence){
                 return response()->json(['error' => 'User competence not found'], 404);
             }
@@ -57,10 +57,10 @@ class UserCompetenceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $code_user, int $code_comp)
+    public function update(Request $request, string $code_user, int $code_comp)
     {
         try{
-            $userCompetence = User_Competence::where('code_user', $code_user)->where('code_comp', $code_comp)->first();
+            $userCompetence = UserCompetence::where('code_user', $code_user)->where('code_comp', $code_comp)->first();
             if(!$userCompetence){
                 return response()->json(['error' => 'User competence not found'], 404);
             }
@@ -74,14 +74,16 @@ class UserCompetenceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $code_user, int $code_comp)
+    public function destroy(string $code_user, int $code_comp)
     {
         try{
-            $userCompetence = User_Competence::where('code_user', $code_user)->where('code_comp', $code_comp)->first();
-            if(!$userCompetence){
+            $deleted = UserCompetence::where('code_user', $code_user)
+                ->where('code_comp', $code_comp)
+                ->delete();
+
+            if($deleted === 0){
                 return response()->json(['error' => 'User competence not found'], 404);
             }
-            $userCompetence->delete();
             return response()->json(['message' => 'User competence deleted successfully'], 200);
         }catch(\Exception $e){
             return response()->json(['error' => 'Failed to delete user competence', 'message' => $e->getMessage()], 500);

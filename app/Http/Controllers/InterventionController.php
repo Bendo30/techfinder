@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Intervention;
 use Illuminate\Http\Request;
 
-class InteventionController extends Controller
+class InterventionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -51,10 +51,10 @@ class InteventionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $code_interv)
+    public function show(int $code_int)
     {
         try{
-            $intervention = Intervention::findOrFail($code_interv);
+            $intervention = Intervention::findOrFail($code_int);
             return response()->json($intervention, 200);
         }catch(\Exception $e){
             return response()->json(['error' => 'Failed to retrieve intervention', 'message' => $e->getMessage()], 500);
@@ -64,7 +64,7 @@ class InteventionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $code_interv)
+    public function update(Request $request, int $code_int)
     {
         $request->validate([
             'date_int' => 'required|date',
@@ -75,7 +75,7 @@ class InteventionController extends Controller
             'code_comp' => 'required|integer|exists:competences,code_comp',
         ]);
         try{
-            $intervention = Intervention::findOrFail($code_interv);
+            $intervention = Intervention::findOrFail($code_int);
             $intervention->update([
                 'date_int' => $request->date_int,
                 'note_int' => $request->note_int ?? $intervention->note_int,
@@ -93,14 +93,32 @@ class InteventionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $code_interv)
+    public function destroy(int $code_int)
     {
         try{
-            $intervention = Intervention::findOrFail($code_interv);
+            $intervention = Intervention::findOrFail($code_int);
             $intervention->delete();
             return response()->json(['message'=>'Intervention deleted successfully'], 200);
         }catch(\Exception $e){
             return response()->json(['error' => 'Failed to delete intervention', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    //fonction pour rechercher à partir d'un mot clé dans le commentaire
+    public function search(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|max:255',
+        ]);
+        try{
+            $query = $request->input('query');
+            $interventions = Intervention::where('commentaire_int', 'like', "%$query%")
+                ->orWhere('code_user_client', 'like', "%$query%")
+                ->orWhere('code_user_techn', 'like', "%$query%")
+                ->get();
+            return response()->json($interventions, 200);
+        }catch(\Exception $e){
+            return response()->json(['error' => 'Failed to search interventions', 'message' => $e->getMessage()], 500);
         }
     }
 }

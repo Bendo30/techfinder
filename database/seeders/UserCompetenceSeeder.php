@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\User_Competence;
+use App\Models\UserCompetence;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class User_CompetenceSeeder extends Seeder
+class UserCompetenceSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        User_Competence::factory(10)->create();
+        UserCompetence::factory(10)->create();
     }
 }

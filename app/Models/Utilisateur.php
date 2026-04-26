@@ -13,6 +13,30 @@ class Utilisateur extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, Notifiable, HasFactory;
 
+    /**
+     * Get the name of the unique identifier for the user.
+     */
+    public function username()
+    {
+        return 'login_user';
+    }
+
+    /**
+     * Get the password for the user.
+     */
+    public function getAuthPassword()
+    {
+        return $this->password_user;
+    }
+
+    /**
+     * Get the column name for the "remember me" token.
+     */
+    public function getRememberTokenName()
+    {
+        return null; // or 'remember_token' if you have it
+    }
+
      /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -29,7 +53,7 @@ class Utilisateur extends Authenticatable implements JWTSubject
     }
 
      protected $hidden = [
-        'password', 'remember_token',
+        'password_user', 'remember_token',
     ];
 
     protected $table = 'utilisateurs';
@@ -63,12 +87,12 @@ class Utilisateur extends Authenticatable implements JWTSubject
 
     function competences()
     {
-        
-        return $this->belongsToMany(Competence::class, 'user_competences', 'code_user', 'code_comp');
+
+        return $this->belongsToMany(Competence::class, 'user_competence', 'code_user', 'code_comp');
     }
 
     public function userCompetences()
     {
-        return $this->hasMany(User_Competence::class, 'code_user', 'code_user');
+        return $this->hasMany(UserCompetence::class, 'code_user', 'code_user');
     }
 }

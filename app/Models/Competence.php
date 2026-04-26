@@ -23,17 +23,17 @@ class Competence extends Model
 
     public function utilisateurs()
     {
-        return $this->belongsToMany(Utilisateur::class, 'user_competences', 'code_comp', 'code_user');
+        return $this->belongsToMany(Utilisateur::class, 'user_competence', 'code_comp', 'code_user');
     }
-    
+
     public function interventions()
     {
         return $this->hasMany(Intervention::class, 'code_comp', 'code_comp');
     }
-    
+
     public function userCompetences()
     {
-        return $this->hasMany(User_Competence::class, 'code_comp', 'code_comp');
+        return $this->hasMany(UserCompetence::class, 'code_comp', 'code_comp');
     }
 
     
